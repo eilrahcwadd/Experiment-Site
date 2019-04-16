@@ -1,0 +1,285 @@
+
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundation for Sites</title>
+    <link rel="stylesheet" href="assets/css/app.css">
+  </head>
+<body>
+
+    
+    <div class="grid-container">
+      <div class="grid-x grid-padding-x">
+        <div class="large-12 cell">
+          <div class="heading">Experiments</div>
+
+        </div>
+      </div>
+      <link href='http://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
+      
+      
+      <div class="container">
+        <div class="grid-1 callout">
+         <p>Test 1</p>
+      
+         <canvas id="myCanvas1">
+      
+      
+          </canvas>
+      
+      <script>
+      var c = document.getElementById('myCanvas1'),
+          ctx = c.getContext('2d'),
+          cw = c.width = window.innerWidth,
+          ch = c.height = window.innerHeight,
+          points = [],
+          tick = 2,
+          opt = {
+            count: 11,
+            range: {
+              x: 5,
+              y: 90
+            },
+            duration: {
+              min: 20,
+              max: 50
+            },
+            thickness: 9,
+            strokeColor: '#000',
+            level: .5,
+            curved: true
+          },
+          rand = function(min, max){
+              return Math.floor( (Math.random() * (max - min + 1) ) + min);
+          },
+          ease = function (t, b, c, d) {
+      	    if ((t/=d/2) < 1) return c/2*t*t + b;
+      	    return -c/2 * ((--t)*(t-2) - 1) + b;
+          };
+      
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = opt.thickness;
+      ctx.strokeStyle = opt.strokeColor;
+      
+      var Point = function(config){
+        this.anchorX = config.x;
+        this.anchorY = config.y;
+        this.x = config.x;
+        this.y = config.y;
+        this.setTarget();  
+      };
+      
+      Point.prototype.setTarget = function(){
+        this.initialX = this.x;
+        this.initialY = this.y;
+        this.targetX = this.anchorX + rand(0, opt.range.x *5) - opt.range.x;
+        this.targetY = this.anchorY + rand(0, opt.range.y * 5) - opt.range.y;
+        this.tick = 0;
+        this.duration = rand(opt.duration.min, opt.duration.max);
+      }
+        
+      Point.prototype.update = function(){
+        var dx = this.targetX - this.x;
+        var dy = this.targetY - this.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if(Math.abs(dist) <= 0){
+          this.setTarget();
+        } else {       
+          var t = this.tick;
+          var b = this.initialY;
+          var c = this.targetY - this.initialY;
+          var d = this.duration;
+          this.y = ease(t, b, c, d);
+          
+          b = this.initialX;
+          c = this.targetX - this.initialX;
+          d = this.duration;
+          this.x = ease(t, b, c, d);
+        
+          this.tick++;
+        }
+      };
+          
+      Point.prototype.render = function(){
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2, false);
+        ctx.fillStyle = '#000';
+        ctx.fill();
+      };
+      
+      var updatePoints = function(){
+        var i = points.length;
+        while(i--){
+          points[i].update();
+        }
+      };
+      
+      var renderPoints = function(){
+        var i = points.length;
+        while(i--){
+          points[i].render();
+        }
+      };
+      
+      var renderShape = function(){
+        ctx.beginPath();
+        var pointCount = points.length;
+        ctx.moveTo(points[0].x, points[0].y);	  
+        var i;
+        for (i = 0; i < pointCount - 1; i++) {
+          var c = (points[i].x + points[i + 1].x) / 2;
+          var d = (points[i].y + points[i + 1].y) / 2;
+          ctx.quadraticCurveTo(points[i].x, points[i].y, c, d);
+        }
+        ctx.lineTo(-opt.range.x - opt.thickness, ch + opt.thickness);
+        ctx.lineTo(cw + opt.range.x + opt.thickness, ch + opt.thickness);
+        ctx.closePath();   
+        ctx.fillStyle = 'hsl('+(tick/2)+', 90%, 90%)';
+        ctx.fill();  
+        ctx.stroke();
+      };
+      
+      var clear = function(){
+        ctx.clearRect(0, 0, cw, ch);
+      };
+      
+      var loop = function(){
+        window.requestAnimFrame(loop, c);
+        tick++;
+        clear();
+        updatePoints();
+        renderShape();
+        //renderPoints();
+      };
+      
+      var i = opt.count + 2;
+      var spacing = (cw + (opt.range.x * 2)) / (opt.count-1);
+      while(i--){
+        points.push(new Point({
+          x: (spacing * (i - 1)) - opt.range.x,
+          y: ch - (ch * opt.level)
+        }));
+      }
+      
+      window.requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(a){window.setTimeout(a,1E3/60)}}();
+      
+      loop();
+      </script>
+      
+        </div>
+      
+        <div class="grid-2 callout">
+            <p> Test 2 </p>
+      
+      
+         <canvas id="myCanvas" width="20" height="20">
+      
+         </canvas>
+         <i class="fi-burst-new"></i>
+      
+      
+         
+         <script>
+        var c = document.getElementById('myCanvas');
+      var $ = c.getContext('2d');
+      
+      
+      var col = function(x, y, r, g, b) {
+        $.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        $.fillRect(x, y, 1,1);
+      }
+      var R = function(x, y, t) {
+        return( Math.floor(192 + 64*Math.cos( (x*x-y*y)/300 + t )) );
+      }
+      
+      var G = function(x, y, t) {
+        return( Math.floor(192 + 64*Math.sin( (x*x*Math.cos(t/4)+y*y*Math.sin(t/3))/300 ) ) );
+      }
+      
+      var B = function(x, y, t) {
+        return( Math.floor(192 + 64*Math.cos( 5*Math.sin(t/9) + ((x-100)*(x-100)+(y-100)*(y-100))/1100) ));
+      }
+      
+      var t = 0;
+      
+      var run = function() {
+        for(x=0;x<=35;x++) {
+          for(y=0;y<=35;y++) {
+            col(x, y, R(x,y,t), G(x,y,t), B(x,y,t));
+          }
+        }
+        t = t + 0.120;
+        window.requestAnimationFrame(run);
+      }
+      
+      run();
+      
+      
+      
+      
+      
+      
+            </script>
+            
+       </div>
+      
+        <div class="grid-3 callout">
+          <p> Test 3</p>
+      
+          <div class="myCanvas3">
+        
+      <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg" version="1.1"> 
+        <rect style="fill: url(#circles-1) #fff;" x="0" y="0" height="10000" width="10000"></rect>
+      
+        <defs> 
+      
+          <pattern id="circles-1" patternUnits="userSpaceOnUse" width="10" height="10"> 
+      
+            <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPScjZmZmJyAvPgogIDxjaXJjbGUgY3g9IjEiIGN5PSIxIiByPSIxIiBmaWxsPSIjMDAwIi8+Cjwvc3ZnPg==" 
+              x="0" y="0" width="30" height="30">
+            </image> 
+          </pattern> 
+        </defs> 
+        </svg>
+      
+      
+        
+            </div>
+          </div>
+        <div class="grid-4 callout">
+      
+         <p>Test 4</p>
+      
+      
+          <?xml version="1.0" encoding="UTF-8"?><svg class="thing" id="pattern" xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="400 500 500 500"><defs><pattern id="waves" height="5.1805778" width="30.066020" patternUnits="userSpaceOnUse"><path class="path" stroke="#ffffff" stroke-width="5" d="M 7.597,0.061 C 5.079,-0.187 2.656,0.302 -0.01,1.788 L -0.01,3.061 C 2.773,1.431 5.173,1.052 7.472,1.280 C 9.770,1.508 11.969,2.361 14.253,3.218 C 18.820,4.931 23.804,6.676 30.066,3.061 L 30.062,1.788 C 23.622,5.497 19.246,3.770 14.691,2.061 C 12.413,1.207 10.115,0.311 7.597,0.061 z "/></pattern></defs><g><rect style="fill:url(#waves)" width="1600" height="1200" x="0" y="0"/></g></svg>  
+      
+      
+      
+      
+      <script> 
+      
+      
+      
+      </script>
+          </div>
+      </div>
+      
+      
+      
+      
+
+      </div>
+    </div>
+
+    
+    
+
+<script src="assets/js/app.js"></script>
+
+
+</body>
+</html>
